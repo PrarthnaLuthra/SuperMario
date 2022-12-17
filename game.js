@@ -30,7 +30,7 @@ loadSprite("blue-steel", "blue-steel.png");
 loadSprite("blue-evil-shroom", "blue-evil.png");
 loadSprite("blue-surprise", "blue-surprise.png");
 
-scene("game", () => {
+scene("game", ({score}) => {
   layers(["bg", "obj", "ui"], "obj");
   const map = [
     "                                     ",
@@ -57,18 +57,18 @@ scene("game", () => {
     ")": [sprite("pipe-bottom-right"), solid(), scale(0.5)],
     "-": [sprite("pipe-top-left"), solid(), scale(0.5)],
     "+": [sprite("pipe-top-right"), solid(), scale(0.5)],
-    "^": [sprite("evil-shroom"), solid()],
+    "^": [sprite("evil-shroom"), solid(),'dangerous'],
     "#": [sprite("mushroom"), solid(),'mushroom',body()],
   };
 
   const gameLevel = addLevel(map, levelCfg);
 
   const scoreLabel = add([
-    text("test"),
+    text(score),
     pos(30, 6),
     layer("ui"),
     {
-      value: "test",
+      value: score,
     },
   ]);
 
@@ -131,6 +131,11 @@ scene("game", () => {
     m.move(20,0)
   })
 
+  const ENEMY_SPEED=20
+  action('dangerous',(d)=>{
+    d.move(-ENEMY_SPEED,0)
+  })
+
   player.collides('coin',(c)=>{
     destroy(c)
     scoreLabel.value++
@@ -142,9 +147,9 @@ scene("game", () => {
     player.biggify(6)
   })
 
-  // player.collides('dangerous',(d)=>{
-  //   globalThis('lose',{score:score})
-  // })
+  player.collides('dangerous',(d)=>{
+    go('lose',{score:scoreLabel.value})
+  })
 
   keyDown('left',()=>{
     player.move(-MOVE_SPEED,0)
@@ -159,4 +164,8 @@ scene("game", () => {
   })
 });
 
-start("game");
+scene('lose', ({ score }) => {
+  add([text(score, 32), origin('center'), pos(width()/2, height()/ 2)])
+})
+
+start("game",{score:0});
