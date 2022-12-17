@@ -8,6 +8,8 @@ kaboom({
 
 const MOVE_SPEED=120
 const JUMP_FORCE=360
+const BIG_JUMP_FORCE=550
+let CURRENT_JUMP_FORCE=JUMP_FORCE
 
 loadRoot("sprites/");
 loadSprite("coin", "coin.png");
@@ -47,7 +49,7 @@ scene("game", () => {
     width: 20,
     height: 20,
     "=": [sprite("block"), solid()],
-    '$': [sprite("coin")],
+    '$': [sprite("coin"),'coin'],
     "%": [sprite("surprise"), solid(), "coin-surprise"],
     "*": [sprite("surprise"), solid(), "mushroom-surprise"],
     "}": [sprite("unboxed"), solid()],
@@ -56,7 +58,7 @@ scene("game", () => {
     "-": [sprite("pipe-top-left"), solid(), scale(0.5)],
     "+": [sprite("pipe-top-right"), solid(), scale(0.5)],
     "^": [sprite("evil-shroom"), solid()],
-    "#": [sprite("mushroom"), solid()],
+    "#": [sprite("mushroom"), solid(),'mushroom',body()],
   };
 
   const gameLevel = addLevel(map, levelCfg);
@@ -72,30 +74,32 @@ scene("game", () => {
 
   add([text("level" + "test", pos(4, 6))]);
 
-  function big(){
-    let timer=0
-    let isBig=false
-    return{
-      update(){
-        if(isBig){
-          timer -=dt()
-          if (timer<=0){
+  function big() {
+    let timer = 0
+    let isBig = false
+    return {
+      update() {
+        if (isBig) {
+          CURRENT_JUMP_FORCE = BIG_JUMP_FORCE
+          timer -= dt()
+          if (timer <= 0) {
             this.smallify()
           }
         }
       },
-      isBig(){
+      isBig() {
         return isBig
       },
-      smallify(){
-        this.scale=vec2(1)
-        timer=0
-        isBig=false
+      smallify() {
+        this.scale = vec2(1)
+        CURRENT_JUMP_FORCE = JUMP_FORCE
+        timer = 0
+        isBig = false
       },
-      biggify(time){
-        this.scale=vec2(2)
-        timer=time
-        isBig=true
+      biggify(time) {
+        this.scale = vec2(2)
+        timer = time
+        isBig = true     
       }
     }
   }
@@ -123,7 +127,24 @@ scene("game", () => {
       
     }
   })
+  action('mushroom',(m)=>{
+    m.move(20,0)
+  })
 
+  player.collides('coin',(c)=>{
+    destroy(c)
+    scoreLabel.value++
+    scoreLabel.text=scoreLabel.value
+  })
+
+  player.collides('mushroom',(m)=>{
+    destroy(m)
+    player.biggify(6)
+  })
+
+  // player.collides('dangerous',(d)=>{
+  //   globalThis('lose',{score:score})
+  // })
 
   keyDown('left',()=>{
     player.move(-MOVE_SPEED,0)
@@ -133,7 +154,7 @@ scene("game", () => {
   })
   keyDown('space',()=>{
     if(player.grounded()){
-      player.jump(JUMP_FORCE)
+      player.jump(CURRENT_JUMP_FORCE)
     }
   })
 });
