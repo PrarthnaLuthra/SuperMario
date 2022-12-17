@@ -44,19 +44,38 @@ scene("game", () => {
     width: 20,
     height: 20,
     "=": [sprite("block"), solid()],
-    "$": [sprite("coin")],
+    '$': [sprite("coin")],
     "%": [sprite("surprise"), solid(), "coin-surprise"],
     "*": [sprite("surprise"), solid(), "mushroom-surprise"],
     "}": [sprite("unboxed"), solid()],
-    "(": [sprite("pipe-bottom-left"),solid(),scale(0.5)],
-    ")": [sprite("pipe-bottom-right"),solid(),scale(0.5)],
-    "-": [sprite("pipe-top-left"),solid(),scale(0.5)],
-    "+": [sprite("pipe-top-right"),solid(),scale(0.5)],
-    "^": [sprite("evil-shroom"),solid()],
-    "#": [sprite("mushroom"),solid()],
+    "(": [sprite("pipe-bottom-left"), solid(), scale(0.5)],
+    ")": [sprite("pipe-bottom-right"), solid(), scale(0.5)],
+    "-": [sprite("pipe-top-left"), solid(), scale(0.5)],
+    "+": [sprite("pipe-top-right"), solid(), scale(0.5)],
+    "^": [sprite("evil-shroom"), solid()],
+    "#": [sprite("mushroom"), solid()],
   };
 
   const gameLevel = addLevel(map, levelCfg);
+
+  const scoreLabel = add([
+    text("test"),
+    pos(30, 6),
+    layer("ui"),
+    {
+      value: "test",
+    },
+  ]);
+
+  add([text("level" + "test", pos(4, 6))]);
+
+  const player = add([
+    sprite("mario"),
+    solid(),
+    pos(30, 0),
+    body(),
+    origin("bot"),
+  ]);
 });
 
 start("game");
